@@ -3,11 +3,10 @@ from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import ProductSerializer,CollectionSerializer
-from store.models import Product,Collection,OrderItem
+from .serializers import ProductSerializer,CollectionSerializer,ReviewSerializer
+from store.models import Product,Collection,OrderItem,Review
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
-
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 
 from rest_framework.viewsets import ModelViewSet
@@ -36,3 +35,10 @@ class CollectionViewSet(ModelViewSet):
     
 
 
+class ReviewViewset(ModelViewSet):
+    
+    serializer_class=ReviewSerializer
+    def get_queryset(self):
+        return Review.objects.filter(product_id=self.kwargs['product_pk'])
+    def get_serializer_context(self):
+        return {'product_id':self.kwargs['product_pk']}
