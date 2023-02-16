@@ -8,7 +8,7 @@ router=routers.DefaultRouter()
 # Line Bellow Generate two urls, 
 # -> products(with the name 'product-list') 
 # -> products/<pk>(with the name 'product-detail').
-router.register('products',views.ProductViewSet) 
+router.register('products',views.ProductViewSet,basename='products') 
 # Same for the Collection.
 router.register('collections',views.CollectionViewSet)
 
