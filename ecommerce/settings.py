@@ -147,5 +147,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Allow rest Rest framework to return integer as integer values
 REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False,
-    'PAGE_SIZE':10
 }

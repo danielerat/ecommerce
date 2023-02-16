@@ -11,14 +11,14 @@ from rest_framework.pagination import PageNumberPagination
 from store.serializers import ProductSerializer,CollectionSerializer,ReviewSerializer
 from store.models import Product,Collection,OrderItem,Review
 from store.filters import ProductFilter
-
+from store.pagination import DefaultPagination
 # ViewSet(which is simply a combination of a bunch of generic Views with more things )
 class ProductViewSet(ModelViewSet):
     queryset=Product.objects.all()
     serializer_class=ProductSerializer
     filter_backends=[DjangoFilterBackend,SearchFilter,OrderingFilter]
     filterset_class=ProductFilter
-    pagination_class=PageNumberPagination
+    pagination_class=DefaultPagination
     search_fields=['title','description','collection__title']
     ordering_fields=['unit_price','last_update']
     def get_serializer_context(self):
