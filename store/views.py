@@ -6,7 +6,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter,OrderingFilter
-from rest_framework.pagination import PageNumberPagination
 
 from store.serializers import ProductSerializer,CollectionSerializer,ReviewSerializer
 from store.models import Product,Collection,OrderItem,Review
