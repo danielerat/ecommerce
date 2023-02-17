@@ -11,7 +11,7 @@ from store.serializers import AddCartItemSerializer, ProductSerializer,Collectio
 from store.models import Product,Collection,OrderItem,Review,Cart, CartItem,Customer
 from store.filters import ProductFilter
 from store.pagination import DefaultPagination
-
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.mixins import DestroyModelMixin,CreateModelMixin,RetrieveModelMixin,UpdateModelMixin
 
 # ViewSet(which is simply a combination of a bunch of generic Views with more things )
@@ -74,6 +74,11 @@ class CartItemViewset(ModelViewSet):
 class CustomerViewset(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class=CustomerSerializer
+
+    def get_permissions(self):
+        if self.request.method=='GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     @action(detail=False,methods=['GET','PUT'])
     def me(self,request):
