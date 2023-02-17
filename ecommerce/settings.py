@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_filters',
     'rest_framework',
+    'djoser',
     'playground',
     "debug_toolbar",
     'store',
@@ -147,6 +148,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Allow rest Rest framework to return integer as integer values
 REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+  
+    ),
 }
-
+SIMPLE_JWT = {
+   'AUTH_HEADER_TYPES': ('JWT',),
+}
 AUTH_USER_MODEL='core.User'
+
+# Settings to override the default djoser serializer with our custom serializer(located in core)
+DJOSER={
+    'SERIALIZERS':{
+        'user_create':'core.serializers.UserCreateSerializer'
+    }
+}
