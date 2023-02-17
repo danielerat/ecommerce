@@ -11,6 +11,7 @@ router=routers.DefaultRouter()
 router.register('products',views.ProductViewSet,basename='products') 
 # Same for the Collection.
 router.register('collections',views.CollectionViewSet)
+router.register('carts',views.CartViewset)
 
 
 # Creating a nested router (list:products/2/reviews and detail:products/2/reviews/1)
@@ -18,7 +19,12 @@ router.register('collections',views.CollectionViewSet)
 products_router=routers.NestedSimpleRouter(router,'products',lookup='product')
 # base name helps us to have (product-reviews-list and product-reviews-detail views of our view set)
 products_router.register('reviews',views.ReviewViewset,basename='product-reviews')
+
+carts_router=routers.NestedSimpleRouter(router,'carts',lookup='cart')
+carts_router.register('items',views.CartItemViewset,basename='cart-items')
+
 urlpatterns = [
   path('',include(router.urls)),
   path('',include(products_router.urls)),
+  path('',include(carts_router.urls)),
 ]
