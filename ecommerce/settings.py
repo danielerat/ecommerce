@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 import os
 
 from dotenv import load_dotenv
@@ -155,12 +156,15 @@ REST_FRAMEWORK = {
 }
 SIMPLE_JWT = {
    'AUTH_HEADER_TYPES': ('JWT',),
+   'ACCESS_TOKEN_LIFETIME':timedelta(days=5),
+   'REFRESH_TOKEN_LIFETIME':timedelta(days=10),
 }
 AUTH_USER_MODEL='core.User'
 
 # Settings to override the default djoser serializer with our custom serializer(located in core)
 DJOSER={
     'SERIALIZERS':{
-        'user_create':'core.serializers.UserCreateSerializer'
+        'user_create':'core.serializers.UserCreateSerializer',
+        'current_user':'core.serializers.UserSerializer'
     }
 }
