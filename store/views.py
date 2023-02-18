@@ -7,9 +7,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.decorators import action
-from store.permissions import IsAdminOrReadOnly,FullDjangoModelPermissions
-from store.serializers import AddCartItemSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer, CartItemSerializer, CartSerializer, UpdateCartItemSerializer,CustomerSerializer
-from store.models import Product,Collection,OrderItem,Review,Cart, CartItem,Customer
+from store.permissions import IsAdminOrReadOnly,ViewCustomerHistoryPermission
+from store.serializers import AddCartItemSerializer, OrderSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer, CartItemSerializer, CartSerializer, UpdateCartItemSerializer,CustomerSerializer
+from store.models import Order, Product,Collection,OrderItem,Review,Cart, CartItem,Customer
 from store.filters import ProductFilter
 from store.pagination import DefaultPagination
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
@@ -79,7 +79,7 @@ class CustomerViewset(ModelViewSet):
     serializer_class=CustomerSerializer
     permission_classes=[IsAdminUser]
 
-    @action(detail=True)
+    @action(detail=True,permission_classes=[ViewCustomerHistoryPermission])
     def history(self,request,pk):
         return Response('ok')
 
@@ -94,3 +94,16 @@ class CustomerViewset(ModelViewSet):
             serializer=CustomerSerializer(customer,data=request.data)
             serializer.is_valid(raise_exception=True)
             return Response(serializer.data)
+
+class OrderViewset(ModelViewSet):
+    serializer_class=OrderSerializer
+    permission_classes=[IsAuthenticated]
+
+    def get_queryset(self):
+        # Is user is staff, then, get all orders, otherwise, get his orders only 
+        user=self.request.user
+        if user.is_staff:
+            return Order.objects.prefetch_related("items__product").all()
+        (customer_id,created)=Customer.objects.only('id').get_or_create(user_id=user.id)
+        return Order.objects.prefetch_related("items__product").filter(customer_id=customer_id)
+    

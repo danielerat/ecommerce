@@ -13,6 +13,7 @@ router.register('products',views.ProductViewSet,basename='products')
 router.register('collections',views.CollectionViewSet)
 router.register('carts',views.CartViewset)
 router.register('customers',views.CustomerViewset)
+router.register('orders',views.OrderViewset,basename="orders")
 
 
 # Creating a nested router (list:products/2/reviews and detail:products/2/reviews/1)
