@@ -96,7 +96,7 @@ class CustomerViewset(ModelViewSet):
             return Response(serializer.data)
 
 class OrderViewset(ModelViewSet):
-    http_method_names=['get', 'patch', 'delete','head', 'options']
+    http_method_names=['get', 'patch', 'post','delete','head', 'options']
     permission_classes=[IsAuthenticated]
 
     def get_permissions(self):
