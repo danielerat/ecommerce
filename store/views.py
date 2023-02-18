@@ -8,7 +8,7 @@ from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.decorators import action
 from store.permissions import IsAdminOrReadOnly,ViewCustomerHistoryPermission
-from store.serializers import AddCartItemSerializer, OrderSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer, CartItemSerializer, CartSerializer, UpdateCartItemSerializer,CustomerSerializer
+from store.serializers import AddCartItemSerializer, CreateOrderSerializer, OrderSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer, CartItemSerializer, CartSerializer, UpdateCartItemSerializer,CustomerSerializer
 from store.models import Order, Product,Collection,OrderItem,Review,Cart, CartItem,Customer
 from store.filters import ProductFilter
 from store.pagination import DefaultPagination
@@ -96,8 +96,19 @@ class CustomerViewset(ModelViewSet):
             return Response(serializer.data)
 
 class OrderViewset(ModelViewSet):
-    serializer_class=OrderSerializer
     permission_classes=[IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        serializer=CreateOrderSerializer(data=request.data,context={'user_id':self.request.user.id})
+        serializer.is_valid(raise_exception=True)
+        order=serializer.save()
+        serializer=OrderSerializer(order)
+        return Response(serializer.data)
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateOrderSerializer
+        return OrderSerializer 
 
     def get_queryset(self):
         # Is user is staff, then, get all orders, otherwise, get his orders only 
@@ -106,4 +117,5 @@ class OrderViewset(ModelViewSet):
             return Order.objects.prefetch_related("items__product").all()
         (customer_id,created)=Customer.objects.only('id').get_or_create(user_id=user.id)
         return Order.objects.prefetch_related("items__product").filter(customer_id=customer_id)
-    
+
+ 
