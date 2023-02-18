@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.decorators import action
+from store.permissions import IsAdminOrReadOnly
 from store.serializers import AddCartItemSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer, CartItemSerializer, CartSerializer, UpdateCartItemSerializer,CustomerSerializer
 from store.models import Product,Collection,OrderItem,Review,Cart, CartItem,Customer
 from store.filters import ProductFilter
@@ -21,6 +22,7 @@ class ProductViewSet(ModelViewSet):
     filter_backends=[DjangoFilterBackend,SearchFilter,OrderingFilter]
     filterset_class=ProductFilter
     pagination_class=DefaultPagination
+    permission_classes=[IsAdminOrReadOnly]
     search_fields=['title','description','collection__title']
     ordering_fields=['unit_price','last_update']
     def get_serializer_context(self):
