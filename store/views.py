@@ -8,7 +8,7 @@ from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.decorators import action
 from store.permissions import IsAdminOrReadOnly,ViewCustomerHistoryPermission
-from store.serializers import AddCartItemSerializer, CreateOrderSerializer, OrderSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer, CartItemSerializer, CartSerializer, UpdateCartItemSerializer,CustomerSerializer
+from store.serializers import AddCartItemSerializer, CreateOrderSerializer, OrderSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer, CartItemSerializer, CartSerializer, UpdateCartItemSerializer,CustomerSerializer, UpdateOrderSerializer
 from store.models import Order, Product,Collection,OrderItem,Review,Cart, CartItem,Customer
 from store.filters import ProductFilter
 from store.pagination import DefaultPagination
@@ -96,8 +96,15 @@ class CustomerViewset(ModelViewSet):
             return Response(serializer.data)
 
 class OrderViewset(ModelViewSet):
+    http_method_names=['get', 'patch', 'delete','head', 'options']
     permission_classes=[IsAuthenticated]
 
+    def get_permissions(self):
+        if self.request.method in ['PATCH','DELETE']:
+            # Admin should delete and update 
+            return [IsAdminUser()]
+            # Authenticated users should view only
+        return [IsAuthenticated()]
     def create(self, request, *args, **kwargs):
         serializer=CreateOrderSerializer(data=request.data,context={'user_id':self.request.user.id})
         serializer.is_valid(raise_exception=True)
@@ -108,6 +115,8 @@ class OrderViewset(ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CreateOrderSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateOrderSerializer
         return OrderSerializer 
 
     def get_queryset(self):
