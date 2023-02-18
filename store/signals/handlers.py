@@ -3,7 +3,7 @@ from django.conf import settings
 from django.dispatch import receiver
 from store.models import Customer
 
-
+# Signal Handler
 @receiver(post_save,sender=settings.AUTH_USER_MODEL)
 def create_customer_for_new_user(sender,**kwargs):
     if kwargs['created']:
