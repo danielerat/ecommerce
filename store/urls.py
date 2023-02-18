@@ -21,6 +21,7 @@ router.register('orders',views.OrderViewset,basename="orders")
 products_router=routers.NestedSimpleRouter(router,'products',lookup='product')
 # base name helps us to have (product-reviews-list and product-reviews-detail views of our view set)
 products_router.register('reviews',views.ReviewViewset,basename='product-reviews')
+products_router.register('images',views.ProductImageViewset,basename='product-images')
 
 carts_router=routers.NestedSimpleRouter(router,'carts',lookup='cart')
 carts_router.register('items',views.CartItemViewset,basename='cart-items')

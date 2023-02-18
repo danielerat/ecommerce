@@ -8,8 +8,8 @@ from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.decorators import action
 from store.permissions import IsAdminOrReadOnly,ViewCustomerHistoryPermission
-from store.serializers import AddCartItemSerializer, CreateOrderSerializer, OrderSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer, CartItemSerializer, CartSerializer, UpdateCartItemSerializer,CustomerSerializer, UpdateOrderSerializer
-from store.models import Order, Product,Collection,OrderItem,Review,Cart, CartItem,Customer
+from store.serializers import AddCartItemSerializer, CreateOrderSerializer, OrderSerializer, ProductImageSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer, CartItemSerializer, CartSerializer, UpdateCartItemSerializer,CustomerSerializer, UpdateOrderSerializer
+from store.models import Order, Product,Collection,OrderItem, ProductImage,Review,Cart, CartItem,Customer
 from store.filters import ProductFilter
 from store.pagination import DefaultPagination
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
@@ -17,7 +17,7 @@ from rest_framework.mixins import DestroyModelMixin,CreateModelMixin,RetrieveMod
 
 # ViewSet(which is simply a combination of a bunch of generic Views with more things )
 class ProductViewSet(ModelViewSet):
-    queryset=Product.objects.all()
+    queryset=Product.objects.prefetch_related('images').all()
     serializer_class=ProductSerializer
     filter_backends=[DjangoFilterBackend,SearchFilter,OrderingFilter]
     filterset_class=ProductFilter
@@ -128,3 +128,10 @@ class OrderViewset(ModelViewSet):
         return Order.objects.prefetch_related("items__product").filter(customer_id=customer_id)
 
  
+class ProductImageViewset(ModelViewSet):
+    serializer_class=ProductImageSerializer
+
+    def get_queryset(self):
+        return ProductImage.objects.filter(product_id=self.kwargs['product_pk'])
+    def get_serializer_context(self):
+        return {"product_id": self.kwargs["product_pk"]}

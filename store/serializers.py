@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Cart, CartItem, Collection, Order, OrderItem,Product,Review,Customer
+from .models import Cart, CartItem, Collection, Order, OrderItem,Product, ProductImage,Review,Customer
 from django.db import transaction
 from store.signals import order_created
 class CollectionSerializer(serializers.ModelSerializer):
@@ -8,11 +8,24 @@ class CollectionSerializer(serializers.ModelSerializer):
         fields=["id","title","products_count"]
     products_count=serializers.IntegerField(read_only=True)
 
+
+
+        
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=ProductImage
+        fields=["id","image"]
+
+    def create(self, validated_data):
+        product_id=self.context['product_id']
+        return ProductImage.objects.create(product_id=product_id,**validated_data)
+
 # Product Serializer
 class ProductSerializer(serializers.ModelSerializer):
+    images=ProductImageSerializer(many=True,read_only=True)
     class Meta:
         model = Product
-        fields= ["id", "title","slug","description","inventory","last_update", "unit_price","collection"]
+        fields= ["id", "title","slug","description","inventory","last_update", "unit_price","collection",'images']
 
 # Serializer to view a simplified version of product
 class SimpleProductSerializer(serializers.ModelSerializer):
@@ -148,4 +161,3 @@ class CreateOrderSerializer(serializers.Serializer):
             order_created.send_robust(self.__class__,order=order)
             return order
            
-        
