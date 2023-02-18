@@ -7,12 +7,12 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.decorators import action
-from store.permissions import IsAdminOrReadOnly
+from store.permissions import IsAdminOrReadOnly,FullDjangoModelPermissions
 from store.serializers import AddCartItemSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer, CartItemSerializer, CartSerializer, UpdateCartItemSerializer,CustomerSerializer
 from store.models import Product,Collection,OrderItem,Review,Cart, CartItem,Customer
 from store.filters import ProductFilter
 from store.pagination import DefaultPagination
-from rest_framework.permissions import IsAuthenticated,AllowAny
+from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.mixins import DestroyModelMixin,CreateModelMixin,RetrieveModelMixin,UpdateModelMixin
 
 # ViewSet(which is simply a combination of a bunch of generic Views with more things )
@@ -39,6 +39,7 @@ class ProductViewSet(ModelViewSet):
 class CollectionViewSet(ModelViewSet):
     queryset=Collection.objects.annotate(products_count=Count('products')).all()
     serializer_class=CollectionSerializer
+    permission_classes=[IsAdminOrReadOnly]
 
     def destroy(self, request, *args, **kwargs):
         if Product.objects.filter(collection_id=kwargs['pk']):
@@ -76,13 +77,14 @@ class CartItemViewset(ModelViewSet):
 class CustomerViewset(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class=CustomerSerializer
+    permission_classes=[IsAdminUser]
 
-    def get_permissions(self):
-        if self.request.method=='GET':
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    @action(detail=True)
+    def history(self,request,pk):
+        return Response('ok')
 
-    @action(detail=False,methods=['GET','PUT'])
+    
+    @action(detail=False,methods=['GET','PUT'],permission_classes=[IsAuthenticated])
     def me(self,request):
         (customer,created)=Customer.objects.get_or_create(user_id=request.user.id)
         if request.method=='GET':
