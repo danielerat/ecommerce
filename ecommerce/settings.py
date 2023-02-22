@@ -176,3 +176,17 @@ DJOSER={
         'current_user':'core.serializers.UserSerializer'
     }
 }
+
+# Django Email Configurations
+
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST='localhost'
+
+EMAIL_HOST_USER=''
+EMAIL_HOST_PASSWORD=''
+EMAIL_PORT=2525
+DEFAULT_FROM_EMAIL=os.environ.get("DEFAULT_FROM_EMAIL")
+
+ADMINS=[
+    ("Danielerat",'admin@danielerat.com')
+]
